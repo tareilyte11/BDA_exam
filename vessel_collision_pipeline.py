@@ -18,10 +18,11 @@ from pyspark.sql.window import Window
 
 #Variables:
 
-ZIP_FILE = "aisdk-2021-12.zip"
+ZIP_FILE = os.environ.get("ZIP_FILE", "aisdk-2021-12.zip")
 TEMP_DIR = "temp_extract"
 PARQUET_OUT = "output/filtered_data.parquet"
 OUTPUT_DIR = "output"
+SPARK_TMP_DIR = os.path.join(os.getcwd(), "spark-tmp")
 
 CENTRAL_LAT = 55.225000
 CENTRAL_LON = 14.245000
@@ -60,9 +61,15 @@ def haversine_m(lat1, lon1, lat2, lon2):
 def create_spark_session():
     return (SparkSession.builder
             .appName("VesselCollisionDetection")
-            .config("spark.driver.memory", "6g")
-            .config("spark.sql.shuffle.partitions", "50")
+            .config("spark.driver.memory", os.environ.get("SPARK_DRIVER_MEMORY", "4g"))
+            .config("spark.driver.memoryOverhead", "1g")
+            .config("spark.driver.maxResultSize", "0")
+            .config("spark.driver.extraJavaOptions",
+                    "-XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=35")
+            .config("spark.local.dir", SPARK_TMP_DIR)
+            .config("spark.sql.shuffle.partitions", "200")
             .config("spark.sql.adaptive.enabled", "true")
+            .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
             .getOrCreate())
 
 def read_and_filter(spark, zip_path, parquet_out):
@@ -198,7 +205,7 @@ def detect_collision(spark, df_clean):
         (x, y, t)
         for x in (-1, 0, 1)
         for y in (-1, 0, 1)
-        for t in (-1, 0, 1)
+        for t in (0, 1)
     ]
     neighbor_offsets_df = spark.createDataFrame(neighbor_offsets, ["x", "y", "t"])
 
@@ -378,10 +385,12 @@ def visualise(traj_a, traj_b, collision_row, name_a, name_b, output_dir):
     plt.close()
     print(f"PNG saved in {png_path}")
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Main pipeline
-# ──────────────────────────────────────────────────────────────────────────────
+
+############ Main pipeline ####################
 def main():
+    shutil.rmtree(SPARK_TMP_DIR, ignore_errors=True)
+    os.makedirs(SPARK_TMP_DIR, exist_ok=True)
+    shutil.rmtree(PARQUET_OUT, ignore_errors=True)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     spark = create_spark_session()
@@ -392,9 +401,9 @@ def main():
     df_clean = remove_gps_anomalies(df)
 
     df_moving = filter_stationary_vessels(df_clean)
-    df_moving.cache()
 
     collision_rows = detect_collision(spark, df_moving)
+    df_moving.cache()
 
     #remove pairs where both vessels had SOG > 0 after the event (meaning they both were moving forward)
     collision_rows = verify_collisions(spark, collision_rows, df_moving)
