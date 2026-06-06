@@ -22,7 +22,7 @@ The following checks were performed before writing to Parquet files:
 4. Invalid MMSI values were removed. Examples such as `000000000`, `111111111`, and `123456789` were excluded.
 5. Only records with navigational status `"Under way using engine"` were retained, since the analysis focused on moving vessels.
 6. Only `Class A` and `Class B` AIS transponders were retained. Other categories (e.g. base stations and AtoN devices) represent infrastructure rather than vessels.
-7. Certain ship types were excluded, including tugs, dredgers, law enforcement vessels, search and rescue (SAR) vessels, pilot vessels
+7. Certain ship types were excluded, including tugs, dredgers, law enforcement vessels, search and rescue (SAR) vessels, pilot vessels.
 These vessel types routinely operate in close proximity to other ships as part of their normal duties,
 so close encounters involving them are not reliable indicators of collisions.
 8. A stationarity check was applied. Any vessel reporting zero speed over ground was treated as stationary at the time of the record,
