@@ -1,0 +1,14 @@
+services:
+  vessel_collision:
+    image: zivile11/vessel-collision-image:latest
+    volumes:
+      - ./aisdk-2021-12.zip:/app/aisdk-2021-12.zip:ro
+      - ./output:/app/output
+      - ./spark-tmp:/app/spark-tmp
+    environment:
+      - ZIP_FILE=aisdk-2021-12.zip
+      - SPARK_DRIVER_MEMORY=4g
+      - PYSPARK_PYTHON=python3
+    # Minimum recommended host resources:
+    mem_limit: 8g
+    shm_size: 1g
