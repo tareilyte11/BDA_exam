@@ -17,10 +17,7 @@ Before writing the data into Parquet files, several validation checks were appli
 
 The following checks were performed before writing to Parquet files:
 1. Invalid timestamps were removed if they could not be parsed or were structurally corrupted.
-2. Coordinate ranges were validated:
-  2.1. Latitude must be within [-90, 90]
-  2.2. Longitude must be within [-180, 180]
-  2.3. Neither coordinate may be NULL
+2. Coordinate ranges were validated: Latitude must be within [-90, 90], Longitude must be within [-180, 180] ,Neither coordinate may be NULL
 3. Only records within 50 nautical miles of the study centre were retained.
 4. Invalid MMSI values were removed. Examples such as `000000000`, `111111111`, and `123456789` were excluded.
 5. Only records with navigational status `"Under way using engine"` were retained, since the analysis focused on moving vessels.
