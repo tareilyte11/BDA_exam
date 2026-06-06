@@ -1,0 +1,14 @@
+==============================================================
+  VESSEL COLLISION DETECTION — 1 CANDIDATE(S)
+==============================================================
+
+  [1] Distance : 81.3 m  (0.0439 nm)
+  Vessel A  MMSI : 219021240
+  Vessel A  Name : KARIN HOEJ
+  Vessel A  Time : 2021-12-13 02:27:09 UTC
+  Vessel A  Pos  : 55.223427°N  14.244630°E
+  Vessel B  MMSI : 232018267
+  Vessel B  Name : MV SCOT CARRIER
+  Vessel B  Time : 2021-12-13 02:28:05 UTC
+  Vessel B  Pos  : 55.223087°N  14.243495°E
+==============================================================
