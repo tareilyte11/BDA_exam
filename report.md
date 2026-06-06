@@ -28,7 +28,7 @@ so close encounters involving them are not reliable indicators of collisions.
 8. A stationarity check was applied. Any vessel reporting zero speed over ground was treated as stationary at the time of the record,
 regardless of its navigational status.
 
-### Data Cleaning — Part 2
+### Data Cleaning(Part 2)
 
 The second cleaning stage was performed on the Parquet files and required grouping by MMSI, since vessel-level behaviour rather than individual records was analysed.
 1.GPS anomaly detection:
