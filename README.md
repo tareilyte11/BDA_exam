@@ -5,36 +5,54 @@ Detects vessel collisions in Danish AIS data (December 2021) using Apache PySpar
 ## Requirements
 
 - Docker and Docker Compose
-- `aisdk-2021-12.zip` placed inside the `Zip_data_ais/` folder in the project root
+- Docker Desktop configured with **at least 8 GB of RAM** (Settings → Resources → Memory)
+- `aisdk-2021-12.zip` placed in the project root (next to `docker-compose.yml`)
 
-## How to build and run
+## How to run with Docker
 
 ```bash
 # Clone the repository
-git clone <repo-url>
-cd BDA_EXAM
+git clone https://github.com/tareilyte11/BDA_exam.git
+cd BDA_exam
 
-# Build the Docker image and run the pipeline
-docker compose up --build
+# Pull the pre-built image from Docker Hub
+docker pull zivile11/vessel-collision-image:latest
+
+# Run the pipeline
+docker compose up
 ```
 
-The pipeline will print the collision result to the console. Output files are saved to `./output/` on the host:
+The pipeline prints the collision result to the console. Output files are saved to `./output/` on the host:
 
 | File | Description |
 |------|-------------|
 | `output/collision_result.txt` | Vessel names, MMSI, timestamp, coordinates, distance |
 | `output/trajectory.png` | Trajectory plot for both vessels around the collision |
-| `output/filtered_data.parquet/` | Cached checkpoint — reused on subsequent runs |
+
+> **Note:** Each run cleans up temp files and re-extracts the data from scratch to avoid stale state from previous runs.
 
 ## Re-running
 
-On the second run the pipeline skips the data ingest (checkpoint already exists) and goes straight to collision detection — this is significantly faster.
-
-To force a full re-run from scratch:
+Simply run again — the pipeline cleans up its own temp files and parquet on startup:
 
 ```bash
-rm -rf output/filtered_data.parquet
 docker compose up
+```
+
+To manually clear leftover files before running (e.g. after a crashed run):
+
+```bash
+rm -rf spark-tmp/ output/filtered_data.parquet
+docker compose up
+```
+
+## Building and pushing the image (maintainers only)
+
+To build and push an amd64 image from an Apple Silicon Mac:
+
+```bash
+docker buildx create --use   # only needed once
+docker buildx build --platform linux/amd64 -t zivile11/vessel-collision-image:latest --push .
 ```
 
 ## Running locally (without Docker)
@@ -47,3 +65,4 @@ source myenv/bin/activate
 pip install -r requirements.txt
 python vessel_collision_pipeline.py
 ```
+
