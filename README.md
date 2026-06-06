@@ -46,15 +46,6 @@ rm -rf spark-tmp/ output/filtered_data.parquet
 docker compose up
 ```
 
-## Building and pushing the image (maintainers only)
-
-To build and push an amd64 image from an Apple Silicon Mac:
-
-```bash
-docker buildx create --use   # only needed once
-docker buildx build --platform linux/amd64 -t zivile11/vessel-collision-image:latest --push .
-```
-
 ## Running locally (without Docker)
 
 Java 11 or 17 must be installed and available on `PATH`.
